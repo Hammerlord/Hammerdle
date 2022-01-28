@@ -1,6 +1,7 @@
 import { Button } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
+import { DELETE, SUBMIT } from "./constants";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
 
@@ -95,7 +96,36 @@ export const App = () => {
         }
     };
 
+    const onDelete = () => {
+        const row = rows[rowIndexToSubmit];
+
+        let index = row.length - 1;
+        for (let i = index; i >= 0; --i) {
+            if (!row[index]) {
+                index = i;
+            }
+        }
+
+        if (index >= 0) {
+            const newRows = [...rows];
+            newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
+            newRows[rowIndexToSubmit][index] = null;
+            setRows(newRows);
+            return;
+        }
+    };
+
     const onKey = (key: string) => {
+        if (key === DELETE) {
+            onDelete();
+            return;
+        }
+
+        if (key === SUBMIT) {
+            onSubmit();
+            return;
+        }
+
         const row = rows[rowIndexToSubmit];
 
         const index = row.findIndex((answer) => {
@@ -118,24 +148,11 @@ export const App = () => {
                 onSubmit();
                 return;
             }
-            const row = rows[rowIndexToSubmit];
 
             // Backspace
             if (e.keyCode === 8) {
-                let index = row.length - 1;
-                for (let i = index; i >= 0; --i) {
-                    if (!row[index]) {
-                        index = i;
-                    }
-                }
-
-                if (index >= 0) {
-                    const newRows = [...rows];
-                    newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
-                    newRows[rowIndexToSubmit][index] = null;
-                    setRows(newRows);
-                    return;
-                }
+                onDelete();
+                return;
             }
 
             onKey(e.key);
@@ -144,7 +161,7 @@ export const App = () => {
         window.addEventListener("keydown", onKeyPress);
 
         return () => window.removeEventListener("keydown", onKeyPress);
-    }, [rows, rowIndexToSubmit, onSubmit, onKey]);
+    }, [rows, rowIndexToSubmit, onSubmit, onKey, onDelete]);
 
     const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
 
@@ -156,11 +173,13 @@ export const App = () => {
                 ))}
 
                 <div className={classes.keyboardContainer}>
-                    <Keyboard onLetterPress={onKey} submissions={rows.slice(0, rowIndexToSubmit)} currentWord={currentWord} />
+                    <Keyboard
+                        onClickButton={onKey}
+                        submissions={rows.slice(0, rowIndexToSubmit)}
+                        enableSubmit={rows[rowIndexToSubmit].every((answer) => answer)}
+                        currentWord={currentWord}
+                    />
                     <div className={classes.submitButtonContainer}>
-                        <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onSubmit}>
-                            Submit Answer
-                        </Button>
                         <div>{submissionError}</div>
                     </div>
                 </div>

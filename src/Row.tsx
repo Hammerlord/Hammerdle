@@ -16,6 +16,8 @@ const useStyles = createUseStyles({
         verticalAlign: "bottom",
         textAlign: "center",
         color: "white",
+        maxHeight: "15vw",
+        maxWidth: "15vw",
     },
     answer: {
         width: "100%",
