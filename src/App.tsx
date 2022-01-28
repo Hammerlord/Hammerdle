@@ -2,6 +2,7 @@ import { Button } from "@material-ui/core";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
+import Row from "./Row";
 
 const useStyles = createUseStyles({
     app: {
@@ -24,38 +25,6 @@ const useStyles = createUseStyles({
         fontSize: "1.1rem",
         fontWeight: 500,
         border: 0,
-    },
-    answerBox: {
-        width: "4rem",
-        height: "4rem",
-        margin: "0.25rem",
-        display: "inline-block",
-        verticalAlign: "bottom",
-        textAlign: "center",
-        color: "white",
-    },
-    answer: {
-        width: "100%",
-        height: "100%",
-        flexDirection: "column",
-        justifyContent: "center",
-        display: "flex",
-        fontSize: "2rem",
-        textTransform: "uppercase",
-        fontWeight: "bold",
-    },
-    unfilled: {
-        border: "2px solid #BBB",
-    },
-    filled: {
-        background: "#777",
-        border: "2px solid transparent",
-    },
-    mispositioned: {
-        backgroundColor: "#b79e1f",
-    },
-    success: {
-        backgroundColor: "#359e3c",
     },
     gridContainer: {
         position: "absolute",
@@ -152,22 +121,7 @@ export const App = () => {
         <div className={classes.app}>
             <div className={classes.gridContainer}>
                 {rows.map((row: string[], i) => (
-                    <div key={i}>
-                        {row.map((answer: string, i: number) => (
-                            <div className={classes.answerBox} key={i}>
-                                <div
-                                    className={classNames(classes.answer, {
-                                        [classes.mispositioned]: currentWord?.split("").some((n) => n === answer),
-                                        [classes.success]: currentWord?.charAt(i) === answer,
-                                        [classes.filled]: answer,
-                                        [classes.unfilled]: !answer,
-                                    })}
-                                >
-                                    {answer}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <Row currentWord={currentWord} row={row} isRowSubmitted={i < rowIndexToSubmit} key={i} />
                 ))}
 
                 <div className={classes.submitButtonContainer}>
