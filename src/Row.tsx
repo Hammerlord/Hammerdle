@@ -55,34 +55,45 @@ const Row = ({ row, currentWord = "", isRowSubmitted }) => {
         return a;
     }, {});
 
-    const getSelector = (letter: string, pos: number) => {
+    const selectors = [];
+
+    row.forEach((letter: string, i) => {
         if (!letter) {
-            return classes.unfilled;
+            selectors.push(classes.unfilled);
+            return;
         }
 
-        if (isRowSubmitted) {
-            if (currentWord.charAt(pos) === letter) {
-                --countMap[letter];
-                return classes.success;
-            }
-
-            if (countMap[letter]) {
-                --countMap[letter];
-                // TODO and is not a duplicate of an earlier letter
-                return classes.mispositioned;
-            }
-
-            return classes.notIncluded;
-        } else {
-            return classes.filled;
+        if (!isRowSubmitted) {
+            selectors.push(classes.filled);
+            return;
         }
-    };
+
+        if (currentWord.charAt(i) === letter) {
+            --countMap[letter];
+            selectors.push(classes.success);
+            return;
+        }
+
+        selectors.push(null);
+    });
+
+    // yellows after all greens are in place
+    row.forEach((letter: string, i) => {
+        if (!selectors[i]) {
+            if (countMap[letter] > 0) {
+                --countMap[letter];
+                selectors[i] = classes.mispositioned;
+            } else {
+                selectors[i] = classes.notIncluded;
+            }
+        }
+    });
 
     return (
         <div className={classes.root}>
             {row.map((letter: string, i: number) => (
                 <div className={classes.answerBox} key={i}>
-                    <div className={classNames(classes.answer, getSelector(letter, i))}>{letter}</div>
+                    <div className={classNames(classes.answer, selectors[i])}>{letter}</div>
                 </div>
             ))}
         </div>
