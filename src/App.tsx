@@ -1,4 +1,4 @@
-import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
+import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
@@ -42,10 +42,6 @@ const useStyles = createUseStyles({
         left: "50%",
         transform: "translateX(-50%) translateY(-10%)",
     },
-    submitButtonContainer: {
-        textAlign: "center",
-        marginTop: "2rem",
-    },
     keyboardContainer: {
         marginTop: "2rem",
     },
@@ -68,7 +64,7 @@ export const App = () => {
     const [words, setWords] = useState([]);
     const [currentWord, setCurrentWord] = useState("");
     const [dictionary, setDictionary] = useState({});
-    const [submissionError, setSubmissionError] = useState("");
+    const [submissionError, setSubmissionError] = useState(null);
     const [gameEnded, setGameEnded] = useState(false);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
 
@@ -102,7 +98,7 @@ export const App = () => {
 
         const currentAnswer = rows[rowIndexToSubmit].join("");
         if (!dictionary[currentAnswer]) {
-            setSubmissionError("Submission is not a word");
+            setSubmissionError(`Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`);
             return;
         }
 
@@ -111,7 +107,6 @@ export const App = () => {
             setRowIndexToSubmit(incremented);
         } else {
             setGameEnded(true);
-            console.log("game ended");
         }
     };
 
@@ -190,6 +185,7 @@ export const App = () => {
         setRows(STARTING_GRID);
         setCurrentWord(getRandomItem(words));
         setGameEnded(false);
+        setRowIndexToSubmit(0);
     };
 
     const onClickNewWord = () => {
@@ -219,9 +215,6 @@ export const App = () => {
                         enableSubmit={!gameEnded && rows[rowIndexToSubmit].every((answer) => answer)}
                         currentWord={currentWord}
                     />
-                    <div className={classes.submitButtonContainer}>
-                        <div>{submissionError}</div>
-                    </div>
                 </div>
             </div>
             {showNewGameDialog && (
@@ -242,6 +235,13 @@ export const App = () => {
                     </DialogActions>
                 </Dialog>
             )}
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                autoHideDuration={5000}
+                open={Boolean(submissionError)}
+                onClose={() => setSubmissionError(null)}
+                message={submissionError}
+            />
         </div>
     );
 };
