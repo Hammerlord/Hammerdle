@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
@@ -11,21 +11,30 @@ const useStyles = createUseStyles({
         userSelect: "none",
         height: "100%",
         width: "100%",
+        letterSpacing: "0.05rem",
         "& button": {
             fontFamily: "Barlow, Arial",
             cursor: "pointer",
-            "&:active": {
-                transform: "translateX(1px) translateY(1px)",
-                transition: "transform 0.2s",
+            letterSpacing: "0.05rem",
+        },
+        "& .MuiButtonBase-root": {
+            borderRadius: "0.25rem",
+            backgroundColor: "#e0e0e0",
+            fontSize: "1.2rem",
+            margin: "0.1rem",
+            fontWeight: "bold",
+            textTransform: "capitalize",
+            padding: "0.5rem 1rem",
+            "&.active": {
+                backgroundColor: "#5a68ce",
+                color: "white",
             },
         },
     },
-    button: {
-        padding: "8px 32px",
-        fontFamily: "Barlow, Arial",
-        fontSize: "1.1rem",
-        fontWeight: 500,
-        border: 0,
+    header: {
+        marginBottom: "1rem",
+        display: "flex",
+        justifyContent: "flex-end",
     },
     gridContainer: {
         position: "absolute",
@@ -45,7 +54,7 @@ const useStyles = createUseStyles({
 const GUESSES = 6;
 const ROW_SIZE = 5;
 
-const start = Array.from({ length: GUESSES }).map(() => Array.from({ length: ROW_SIZE }).map(() => null));
+const STARTING_GRID = Array.from({ length: GUESSES }).map(() => Array.from({ length: ROW_SIZE }).map(() => null));
 
 export const getRandomItem = (array: any[]): any => {
     const index = Math.floor(Math.random() * array.length);
@@ -54,12 +63,14 @@ export const getRandomItem = (array: any[]): any => {
 
 export const App = () => {
     const classes = useStyles();
-    const [rows, setRows] = useState(start);
+    const [rows, setRows] = useState(STARTING_GRID);
     const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
     const [words, setWords] = useState([]);
     const [currentWord, setCurrentWord] = useState("");
     const [dictionary, setDictionary] = useState({});
     const [submissionError, setSubmissionError] = useState("");
+    const [gameEnded, setGameEnded] = useState(false);
+    const [showNewGameDialog, setShowNewGameDialog] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -80,6 +91,11 @@ export const App = () => {
     }, []);
 
     const onSubmit = () => {
+        if (gameEnded) {
+            return;
+        }
+
+        const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
         if (isIncompleteAnswer) {
             return;
         }
@@ -93,6 +109,9 @@ export const App = () => {
         const incremented = rowIndexToSubmit + 1;
         if (incremented < GUESSES) {
             setRowIndexToSubmit(incremented);
+        } else {
+            setGameEnded(true);
+            console.log("game ended");
         }
     };
 
@@ -116,6 +135,10 @@ export const App = () => {
     };
 
     const onKey = (key: string) => {
+        if (gameEnded) {
+            return;
+        }
+
         if (key === DELETE) {
             onDelete();
             return;
@@ -163,11 +186,28 @@ export const App = () => {
         return () => window.removeEventListener("keydown", onKeyPress);
     }, [rows, rowIndexToSubmit, onSubmit, onKey, onDelete]);
 
-    const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
+    const newWord = () => {
+        setRows(STARTING_GRID);
+        setCurrentWord(getRandomItem(words));
+        setGameEnded(false);
+    };
+
+    const onClickNewWord = () => {
+        if (gameEnded) {
+            newWord();
+        } else {
+            setShowNewGameDialog(true);
+        }
+    };
 
     return (
         <div className={classes.app}>
             <div className={classes.gridContainer}>
+                <div className={classes.header}>
+                    <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
+                        New Word
+                    </ButtonBase>
+                </div>
                 {rows.map((row: string[], i) => (
                     <Row currentWord={currentWord} row={row} isRowSubmitted={i < rowIndexToSubmit} key={i} />
                 ))}
@@ -175,7 +215,7 @@ export const App = () => {
                 <div className={classes.keyboardContainer}>
                     <Keyboard
                         onClickButton={onKey}
-                        submissions={rows.slice(0, rowIndexToSubmit)}
+                        submissions={gameEnded ? rows : rows.slice(0, rowIndexToSubmit)}
                         enableSubmit={rows[rowIndexToSubmit].every((answer) => answer)}
                         currentWord={currentWord}
                     />
@@ -184,6 +224,24 @@ export const App = () => {
                     </div>
                 </div>
             </div>
+            {showNewGameDialog && (
+                <Dialog open={true} onBackdropClick={() => setShowNewGameDialog(false)} disablePortal={true}>
+                    <DialogTitle>Reset Game</DialogTitle>
+                    <DialogContent>There is a game in progress. Restart with a new word?</DialogContent>
+                    <DialogActions>
+                        <ButtonBase
+                            className={"active"}
+                            onClick={() => {
+                                newWord();
+                                setShowNewGameDialog(false);
+                            }}
+                        >
+                            Restart
+                        </ButtonBase>
+                        <ButtonBase onClick={() => setShowNewGameDialog(false)}>Cancel</ButtonBase>
+                    </DialogActions>
+                </Dialog>
+            )}
         </div>
     );
 };
