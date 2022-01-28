@@ -245,9 +245,7 @@ export const App = () => {
             )}
             {showWinDialog && (
                 <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
-                    <DialogTitle>
-                        You solved the puzzle in {rowIndexToSubmit} {rowIndexToSubmit > 1 ? "tries" : "try"}{" "}
-                    </DialogTitle>
+                    <DialogTitle>You solved the puzzle</DialogTitle>
                     <DialogContent>Yay!</DialogContent>
                     <DialogActions>
                         <ButtonBase
