@@ -1,4 +1,4 @@
-import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from "@material-ui/core";
+import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
@@ -32,9 +32,10 @@ const useStyles = createUseStyles({
         },
     },
     header: {
-        marginBottom: "1rem",
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
+        margin: "0 2rem",
+        maxWidth: "100vw",
     },
     gridContainer: {
         position: "absolute",
@@ -44,6 +45,12 @@ const useStyles = createUseStyles({
     },
     keyboardContainer: {
         marginTop: "2rem",
+    },
+    newWordContainer: {
+        height: "5rem",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
     },
 });
 
@@ -208,9 +215,12 @@ export const App = () => {
         <div className={classes.app}>
             <div className={classes.gridContainer}>
                 <div className={classes.header}>
-                    <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
-                        New word
-                    </ButtonBase>
+                    <h1>Hammerdle</h1>
+                    <div className={classes.newWordContainer}>
+                        <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
+                            New word
+                        </ButtonBase>
+                    </div>
                 </div>
                 {rows.map((row: string[], i) => (
                     <Row currentWord={correctAnswer} row={row} isRowSubmitted={gameEnded || i < rowIndexToSubmit} key={i} />
