@@ -197,9 +197,13 @@ export const App = () => {
     }, [rows, rowIndexToSubmit, onSubmit, onKey, onDelete]);
 
     const newWord = () => {
+        if (!gameEnded) {
+            setNotice(`The word was: ${correctAnswer.toUpperCase()}`);
+        } else {
+            setGameEnded(false);
+        }
         setRows(STARTING_GRID);
         setCorrectAnswer(getRandomItem(words));
-        setGameEnded(false);
         setRowIndexToSubmit(0);
     };
 
