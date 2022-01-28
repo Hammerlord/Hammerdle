@@ -62,11 +62,12 @@ export const App = () => {
     const [rows, setRows] = useState(STARTING_GRID);
     const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
     const [words, setWords] = useState([]);
-    const [currentWord, setCurrentWord] = useState("");
+    const [correctAnswer, setCorrectAnswer] = useState("");
     const [dictionary, setDictionary] = useState({});
-    const [submissionError, setSubmissionError] = useState(null);
+    const [notice, setNotice] = useState(null);
     const [gameEnded, setGameEnded] = useState(false);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
+    const [showWinDialog, setShowWinDialog] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -76,7 +77,7 @@ export const App = () => {
             const dictionaryWordsText = await dictionaryWordsResource.text();
             const words = availableWordsText.split("\n");
             setWords(words);
-            setCurrentWord(getRandomItem(words));
+            setCorrectAnswer(getRandomItem(words));
             setDictionary(
                 words.concat(dictionaryWordsText.split("\n")).reduce((acc, word) => {
                     acc[word] = true;
@@ -98,14 +99,21 @@ export const App = () => {
 
         const currentAnswer = rows[rowIndexToSubmit].join("");
         if (!dictionary[currentAnswer]) {
-            setSubmissionError(`Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`);
+            setNotice(`Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`);
             return;
+        }
+
+        if (currentAnswer === correctAnswer) {
+            setGameEnded(true);
+            setShowWinDialog(true);
         }
 
         const incremented = rowIndexToSubmit + 1;
         if (incremented < GUESSES) {
             setRowIndexToSubmit(incremented);
         } else {
+            // Game over
+            setNotice(`Game ended! The correct answer was: ${correctAnswer.toUpperCase()}`);
             setGameEnded(true);
         }
     };
@@ -183,7 +191,7 @@ export const App = () => {
 
     const newWord = () => {
         setRows(STARTING_GRID);
-        setCurrentWord(getRandomItem(words));
+        setCorrectAnswer(getRandomItem(words));
         setGameEnded(false);
         setRowIndexToSubmit(0);
     };
@@ -196,16 +204,18 @@ export const App = () => {
         }
     };
 
+    console.log(correctAnswer);
+
     return (
         <div className={classes.app}>
             <div className={classes.gridContainer}>
                 <div className={classes.header}>
                     <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
-                        New Word
+                        New word
                     </ButtonBase>
                 </div>
                 {rows.map((row: string[], i) => (
-                    <Row currentWord={currentWord} row={row} isRowSubmitted={gameEnded || i < rowIndexToSubmit} key={i} />
+                    <Row currentWord={correctAnswer} row={row} isRowSubmitted={gameEnded || i < rowIndexToSubmit} key={i} />
                 ))}
 
                 <div className={classes.keyboardContainer}>
@@ -213,13 +223,13 @@ export const App = () => {
                         onClickButton={onKey}
                         submissions={gameEnded ? rows : rows.slice(0, rowIndexToSubmit)}
                         enableSubmit={!gameEnded && rows[rowIndexToSubmit].every((answer) => answer)}
-                        currentWord={currentWord}
+                        currentWord={correctAnswer}
                     />
                 </div>
             </div>
             {showNewGameDialog && (
-                <Dialog open={true} onBackdropClick={() => setShowNewGameDialog(false)} disablePortal={true}>
-                    <DialogTitle>Reset Game</DialogTitle>
+                <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
+                    <DialogTitle>Reset game</DialogTitle>
                     <DialogContent>There is a game in progress. Restart with a new word?</DialogContent>
                     <DialogActions>
                         <ButtonBase
@@ -235,12 +245,32 @@ export const App = () => {
                     </DialogActions>
                 </Dialog>
             )}
+            {showWinDialog && (
+                <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
+                    <DialogTitle>
+                        You solved the puzzle in {rowIndexToSubmit} {rowIndexToSubmit > 1 ? "tries" : "try"}{" "}
+                    </DialogTitle>
+                    <DialogContent>Yay!</DialogContent>
+                    <DialogActions>
+                        <ButtonBase
+                            className={"active"}
+                            onClick={() => {
+                                newWord();
+                                setShowWinDialog(false);
+                            }}
+                        >
+                            New word
+                        </ButtonBase>
+                        <ButtonBase onClick={() => setShowWinDialog(false)}>Close</ButtonBase>
+                    </DialogActions>
+                </Dialog>
+            )}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 autoHideDuration={5000}
-                open={Boolean(submissionError)}
-                onClose={() => setSubmissionError(null)}
-                message={submissionError}
+                open={Boolean(notice)}
+                onClose={() => setNotice(null)}
+                message={notice}
             />
         </div>
     );
