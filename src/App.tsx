@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
-import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
+import Keyboard from "./Keyboard";
 import Row from "./Row";
 
 const useStyles = createUseStyles({
@@ -34,6 +34,9 @@ const useStyles = createUseStyles({
     },
     submitButtonContainer: {
         textAlign: "center",
+        marginTop: "2rem",
+    },
+    keyboardContainer: {
         marginTop: "2rem",
     },
 });
@@ -92,6 +95,22 @@ export const App = () => {
         }
     };
 
+    const onKey = (key: string) => {
+        const row = rows[rowIndexToSubmit];
+
+        const index = row.findIndex((answer) => {
+            return !answer;
+        });
+        const isValidEntry = key.length === 1 && key.match(/([a-zA-Z]+)/gi) && index > -1 && index < row.length;
+
+        if (isValidEntry) {
+            const newRows = [...rows];
+            newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
+            newRows[rowIndexToSubmit][index] = key.toLowerCase();
+            setRows(newRows);
+        }
+    };
+
     useEffect(() => {
         const onKeyPress = (e) => {
             // Enter
@@ -119,23 +138,13 @@ export const App = () => {
                 }
             }
 
-            const index = row.findIndex((answer) => {
-                return !answer;
-            });
-            const isValidEntry = e.key.length === 1 && e.key.match(/([a-zA-Z]+)/gi) && index > -1 && index < row.length;
-
-            if (isValidEntry) {
-                const newRows = [...rows];
-                newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
-                newRows[rowIndexToSubmit][index] = e.key.toLowerCase();
-                setRows(newRows);
-            }
+            onKey(e.key);
         };
 
         window.addEventListener("keydown", onKeyPress);
 
         return () => window.removeEventListener("keydown", onKeyPress);
-    }, [rows, rowIndexToSubmit, onSubmit]);
+    }, [rows, rowIndexToSubmit, onSubmit, onKey]);
 
     const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
 
@@ -146,11 +155,14 @@ export const App = () => {
                     <Row currentWord={currentWord} row={row} isRowSubmitted={i < rowIndexToSubmit} key={i} />
                 ))}
 
-                <div className={classes.submitButtonContainer}>
-                    <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onSubmit}>
-                        Submit Answer
-                    </Button>
-                    <div>{submissionError}</div>
+                <div className={classes.keyboardContainer}>
+                    <Keyboard onLetterPress={onKey} submissions={rows.slice(0, rowIndexToSubmit)} currentWord={currentWord} />
+                    <div className={classes.submitButtonContainer}>
+                        <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onSubmit}>
+                            Submit Answer
+                        </Button>
+                        <div>{submissionError}</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 
 const useStyles = createUseStyles({
+    root: {
+        display: "flex",
+        justifyContent: "center",
+    },
     answerBox: {
         width: "4rem",
         height: "4rem",
@@ -68,7 +72,7 @@ const Row = ({ row, currentWord = "", isRowSubmitted }) => {
     };
 
     return (
-        <div>
+        <div className={classes.root}>
             {row.map((letter: string, i: number) => (
                 <div className={classes.answerBox} key={i}>
                     <div className={classNames(classes.answer, getSelector(letter, i))}>{letter}</div>
