@@ -4,6 +4,10 @@ import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
+import dictionaryWords from "../resources/5letterwords.json";
+import availableWords from "../resources/words.json";
+
+console.log(dictionaryWords);
 
 const useStyles = createUseStyles({
     app: {
@@ -68,31 +72,18 @@ export const App = () => {
     const classes = useStyles();
     const [rows, setRows] = useState(STARTING_GRID);
     const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
-    const [words, setWords] = useState([]);
-    const [correctAnswer, setCorrectAnswer] = useState("");
-    const [dictionary, setDictionary] = useState({});
+    const [words] = useState(availableWords.words);
+    const [correctAnswer, setCorrectAnswer] = useState(getRandomItem(words));
+    const [dictionary, setDictionary] = useState(
+        availableWords.words.concat(dictionaryWords.words).reduce((acc, word) => {
+            acc[word] = true;
+            return acc;
+        }, {})
+    );
     const [notice, setNotice] = useState(null);
     const [gameEnded, setGameEnded] = useState(false);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const availableWordsResource = await fetch("./resources/words.txt");
-            const availableWordsText = await availableWordsResource.text();
-            const dictionaryWordsResource = await fetch("./resources/5letterwords.txt");
-            const dictionaryWordsText = await dictionaryWordsResource.text();
-            const words = availableWordsText.split("\n");
-            setWords(words);
-            setCorrectAnswer(getRandomItem(words));
-            setDictionary(
-                words.concat(dictionaryWordsText.split("\n")).reduce((acc, word) => {
-                    acc[word] = true;
-                    return acc;
-                }, {})
-            );
-        })();
-    }, []);
 
     const onSubmit = () => {
         if (gameEnded) {
