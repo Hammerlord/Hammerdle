@@ -29,8 +29,8 @@ const useStyles = createUseStyles({
         border: "2px solid #CCC",
     },
     filled: {
-        border: "2px solid #888",
-        color: "#888",
+        border: "2px solid #777",
+        color: "#777",
     },
     notIncluded: {
         background: "#777",

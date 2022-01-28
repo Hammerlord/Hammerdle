@@ -54,14 +54,25 @@ export const App = () => {
     const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
     const [words, setWords] = useState([]);
     const [currentWord, setCurrentWord] = useState("");
+    const [dictionary, setDictionary] = useState({});
+    const [submissionError, setSubmissionError] = useState("");
 
     useEffect(() => {
-        fetch("./resources/words.txt").then(async (resource) => {
-            const text = await resource.text();
-            const words = text.split("\n");
+        (async () => {
+            const availableWordsResource = await fetch("./resources/words.txt");
+            const availableWordsText = await availableWordsResource.text();
+            const dictionaryWordsResource = await fetch("./resources/5letterwords.txt");
+            const dictionaryWordsText = await dictionaryWordsResource.text();
+            const words = availableWordsText.split("\n");
             setWords(words);
             setCurrentWord(getRandomItem(words));
-        });
+            setDictionary(
+                words.concat(dictionaryWordsText.split("\n")).reduce((acc, word) => {
+                    acc[word] = true;
+                    return acc;
+                }, {})
+            );
+        })();
     }, []);
 
     useEffect(() => {
@@ -111,6 +122,12 @@ export const App = () => {
             return;
         }
 
+        const currentAnswer = rows[rowIndexToSubmit].join("");
+        if (!dictionary[currentAnswer]) {
+            setSubmissionError("Submission is not a word");
+            return;
+        }
+
         const incremented = rowIndexToSubmit + 1;
         if (incremented < GUESSES) {
             setRowIndexToSubmit(incremented);
@@ -128,6 +145,7 @@ export const App = () => {
                     <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onClickSubmit}>
                         Submit Answer
                     </Button>
+                    <div>{submissionError}</div>
                 </div>
             </div>
         </div>
