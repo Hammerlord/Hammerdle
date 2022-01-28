@@ -75,8 +75,30 @@ export const App = () => {
         })();
     }, []);
 
+    const onSubmit = () => {
+        if (isIncompleteAnswer) {
+            return;
+        }
+
+        const currentAnswer = rows[rowIndexToSubmit].join("");
+        if (!dictionary[currentAnswer]) {
+            setSubmissionError("Submission is not a word");
+            return;
+        }
+
+        const incremented = rowIndexToSubmit + 1;
+        if (incremented < GUESSES) {
+            setRowIndexToSubmit(incremented);
+        }
+    };
+
     useEffect(() => {
         const onKeyPress = (e) => {
+            // Enter
+            if (e.keyCode === 13) {
+                onSubmit();
+                return;
+            }
             const row = rows[rowIndexToSubmit];
 
             // Backspace
@@ -113,26 +135,9 @@ export const App = () => {
         window.addEventListener("keydown", onKeyPress);
 
         return () => window.removeEventListener("keydown", onKeyPress);
-    }, [rows, rowIndexToSubmit]);
+    }, [rows, rowIndexToSubmit, onSubmit]);
 
     const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
-
-    const onClickSubmit = () => {
-        if (isIncompleteAnswer) {
-            return;
-        }
-
-        const currentAnswer = rows[rowIndexToSubmit].join("");
-        if (!dictionary[currentAnswer]) {
-            setSubmissionError("Submission is not a word");
-            return;
-        }
-
-        const incremented = rowIndexToSubmit + 1;
-        if (incremented < GUESSES) {
-            setRowIndexToSubmit(incremented);
-        }
-    };
 
     return (
         <div className={classes.app}>
@@ -142,7 +147,7 @@ export const App = () => {
                 ))}
 
                 <div className={classes.submitButtonContainer}>
-                    <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onClickSubmit}>
+                    <Button variant={"contained"} color={"primary"} disabled={isIncompleteAnswer} onClick={onSubmit}>
                         Submit Answer
                     </Button>
                     <div>{submissionError}</div>
