@@ -209,14 +209,14 @@ export const App = () => {
                     </ButtonBase>
                 </div>
                 {rows.map((row: string[], i) => (
-                    <Row currentWord={currentWord} row={row} isRowSubmitted={i < rowIndexToSubmit} key={i} />
+                    <Row currentWord={currentWord} row={row} isRowSubmitted={gameEnded || i < rowIndexToSubmit} key={i} />
                 ))}
 
                 <div className={classes.keyboardContainer}>
                     <Keyboard
                         onClickButton={onKey}
                         submissions={gameEnded ? rows : rows.slice(0, rowIndexToSubmit)}
-                        enableSubmit={rows[rowIndexToSubmit].every((answer) => answer)}
+                        enableSubmit={!gameEnded && rows[rowIndexToSubmit].every((answer) => answer)}
                         currentWord={currentWord}
                     />
                     <div className={classes.submitButtonContainer}>

@@ -31,8 +31,8 @@ const useKeyboardStyles = createUseStyles({
             },
             "&.submit": {
                 width: "unset",
-                padding: "0 3rem important",
-                marginRight: "2rem important",
+                padding: "0 3rem",
+                marginRight: "2rem",
                 backgroundColor: "#5a68ce",
                 color: "white",
                 "&:disabled": {
