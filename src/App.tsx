@@ -167,6 +167,7 @@ export const App = () => {
         const onKeyPress = (e) => {
             // Enter
             if (e.keyCode === 13) {
+                e.preventDefault();
                 onSubmit();
                 return;
             }
