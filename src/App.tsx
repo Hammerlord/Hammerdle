@@ -7,8 +7,6 @@ import Row from "./Row";
 import dictionaryWords from "../resources/5letterwords.json";
 import availableWords from "../resources/words.json";
 
-console.log(dictionaryWords);
-
 const useStyles = createUseStyles({
     app: {
         fontFamily: "Barlow, Arial",
