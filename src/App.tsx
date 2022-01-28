@@ -204,8 +204,6 @@ export const App = () => {
         }
     };
 
-    console.log(correctAnswer);
-
     return (
         <div className={classes.app}>
             <div className={classes.gridContainer}>

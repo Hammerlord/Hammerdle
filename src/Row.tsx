@@ -50,6 +50,11 @@ const useStyles = createUseStyles({
 const Row = ({ row, currentWord = "", isRowSubmitted }) => {
     const classes = useStyles();
 
+    const countMap = currentWord.split("").reduce((a, c) => {
+        a[c] = (a[c] || 0) + 1;
+        return a;
+    }, {});
+
     const getSelector = (letter: string, pos: number) => {
         if (!letter) {
             return classes.unfilled;
@@ -57,10 +62,12 @@ const Row = ({ row, currentWord = "", isRowSubmitted }) => {
 
         if (isRowSubmitted) {
             if (currentWord.charAt(pos) === letter) {
+                --countMap[letter];
                 return classes.success;
             }
 
-            if (currentWord.split("").some((n) => n === letter)) {
+            if (countMap[letter]) {
+                --countMap[letter];
                 // TODO and is not a duplicate of an earlier letter
                 return classes.mispositioned;
             }
