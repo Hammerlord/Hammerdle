@@ -272,7 +272,7 @@ export const App = () => {
                         <Button
                             color={"primary"}
                             onClick={() => {
-                                restartGame();
+                                giveUp();
                                 setShowNewGameDialog(false);
                             }}
                         >
