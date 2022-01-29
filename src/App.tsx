@@ -9,6 +9,7 @@ import mapleStoryLib from "../resources/words.json";
 import commonWords from "../resources/commonwords.json";
 import { Settings } from "@material-ui/icons";
 import Button from "./Button";
+import { getHints } from "./utils";
 
 const useStyles = createUseStyles({
     app: {
@@ -75,13 +76,38 @@ export const App = () => {
     const [numGuesses, setNumGuesses] = useState(0);
     const [correctAnswer, setCorrectAnswer] = useState("");
     const [dictionary, setDictionary] = useState(baseDictionary);
-
     const [notice, setNotice] = useState(null);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
     const [isMapleStoryDictionEnabled, setEnableMapleStoryDiction] = useState(false);
+    const [isHardMode, setIsHardMode] = useState(false);
     const [gameEnded, setGameEnded] = useState(false);
+
+    const getInvalidAnswerError = (): string | undefined => {
+        const currentAnswer = rows[numGuesses].join("");
+        if (!dictionary[currentAnswer]) {
+            return `Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`;
+        }
+
+        if (!isHardMode) {
+            return;
+        }
+
+        const { successes, mustUse } = getHints({ submissions: rows.slice(0, numGuesses), correctAnswer });
+        const misplacedSuccesses = successes.filter((index) => currentAnswer[index] !== correctAnswer[index]);
+        if (misplacedSuccesses.length > 0) {
+            return `Hardmode: Answer must match hints - ${misplacedSuccesses
+                .map((index) => currentAnswer[index].toUpperCase())
+                .join(", ")} not matching`;
+        }
+
+        rows[numGuesses].forEach((letter) => --mustUse[letter]);
+        const mispositionedLetters = Object.keys(mustUse).filter((letter) => mustUse[letter] > 0);
+        if (mispositionedLetters.length > 0) {
+            return `Hardmode: Answer must match hints - missing ${mispositionedLetters.map((letter) => letter.toUpperCase()).join(", ")}`;
+        }
+    };
 
     const onSubmit = () => {
         if (gameEnded) {
@@ -93,15 +119,16 @@ export const App = () => {
             return;
         }
 
-        const currentAnswer = rows[numGuesses].join("");
-        if (!dictionary[currentAnswer]) {
-            setNotice(`Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`);
+        const invalidAnswerError = getInvalidAnswerError();
+        if (invalidAnswerError) {
+            setNotice(invalidAnswerError);
             return;
         }
 
         const incremented = numGuesses + 1;
         setNumGuesses(incremented);
 
+        const currentAnswer = rows[numGuesses].join("");
         if (currentAnswer === correctAnswer) {
             setShowWinDialog(true);
             setGameEnded(true);
@@ -203,10 +230,10 @@ export const App = () => {
     };
 
     const restartGame = () => {
-        let words: object;
+        let words: string[];
 
         if (!isMapleStoryDictionEnabled) {
-            words = getCommonDiction();
+            words = Object.keys(getCommonDiction());
             setDictionary(baseDictionary);
         } else {
             words = mapleStoryLib.words;
@@ -214,7 +241,7 @@ export const App = () => {
         }
 
         setRows(STARTING_GRID);
-        setCorrectAnswer(getRandomItem(Object.keys(words)));
+        setCorrectAnswer(getRandomItem(words));
         setNumGuesses(0);
         setGameEnded(false);
     };
@@ -307,11 +334,19 @@ export const App = () => {
                     <DialogTitle>Settings</DialogTitle>
                     <DialogContent>
                         <div>
-                            <Checkbox
-                                onClick={() => setEnableMapleStoryDiction(!isMapleStoryDictionEnabled)}
-                                checked={isMapleStoryDictionEnabled}
-                            />
-                            Enable MapleStory diction
+                            <label>
+                                <Checkbox
+                                    onClick={() => setEnableMapleStoryDiction(!isMapleStoryDictionEnabled)}
+                                    checked={isMapleStoryDictionEnabled}
+                                />
+                                Enable MapleStory diction
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                <Checkbox onClick={() => setIsHardMode(!isHardMode)} checked={isHardMode} />
+                                Enable hard mode
+                            </label>
                         </div>
                     </DialogContent>
                     <DialogActions>
