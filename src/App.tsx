@@ -41,12 +41,11 @@ const useStyles = createUseStyles({
     },
     gridContainer: {
         position: "absolute",
-        top: "10%",
         left: "50%",
-        transform: "translateX(-50%) translateY(-10%)",
+        transform: "translateX(-50%)",
     },
     keyboardContainer: {
-        marginTop: "2rem",
+        marginTop: "1.5rem",
     },
     newWordContainer: {
         height: "5rem",
