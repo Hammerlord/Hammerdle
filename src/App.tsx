@@ -82,7 +82,7 @@ export const App = () => {
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
     const [settings, setSettings] = useState({
-        isMapleStoryDictionEnabled: false,
+        isMapleStoryDictionEnabled: true,
         isHardMode: false,
     });
 
