@@ -319,7 +319,9 @@ export const App = () => {
             {showWinDialog && (
                 <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
                     <DialogTitle>You solved the puzzle</DialogTitle>
-                    <DialogContent>Yay!</DialogContent>
+                    <DialogContent>
+                        Yay! Your stats: {numGuesses} / {GUESSES} attempts
+                    </DialogContent>
                     <DialogActions>
                         <Button
                             color={"primary"}
