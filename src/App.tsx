@@ -1,4 +1,4 @@
-import { ButtonBase, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
+import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
@@ -8,6 +8,7 @@ import dictionaryWords from "../resources/5letterwords.json";
 import mapleStoryLib from "../resources/words.json";
 import commonWords from "../resources/commonwords.json";
 import { Settings } from "@material-ui/icons";
+import Button from "./Button";
 
 const useStyles = createUseStyles({
     app: {
@@ -20,19 +21,6 @@ const useStyles = createUseStyles({
             fontFamily: "Barlow, Arial",
             cursor: "pointer",
             letterSpacing: "0.05rem",
-        },
-        "& .MuiButtonBase-root": {
-            borderRadius: "0.25rem",
-            backgroundColor: "#e0e0e0",
-            fontSize: "1.2rem",
-            margin: "0.1rem",
-            fontWeight: "bold",
-            textTransform: "capitalize",
-            padding: "0.5rem 1rem",
-            "&.active": {
-                backgroundColor: "#5a68ce",
-                color: "white",
-            },
         },
     },
     header: {
@@ -252,14 +240,14 @@ export const App = () => {
                     <h1>Hammerdle</h1>
                     <div className={classes.headerRight}>
                         <div className={classes.toolContainer}>
-                            <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
+                            <Button color={gameEnded ? "primary" : undefined} onClick={onClickNewWord}>
                                 New word
-                            </ButtonBase>
+                            </Button>
                         </div>
                         <div className={classes.toolContainer}>
-                            <ButtonBase onClick={() => setShowSettingsDialog(!showSettingsDialog)}>
+                            <Button color={null} onClick={() => setShowSettingsDialog(!showSettingsDialog)}>
                                 <Settings />
-                            </ButtonBase>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -281,16 +269,16 @@ export const App = () => {
                     <DialogTitle>Reset game</DialogTitle>
                     <DialogContent>There is a game in progress. Restart with a new word?</DialogContent>
                     <DialogActions>
-                        <ButtonBase
-                            className={"active"}
+                        <Button
+                            color={"primary"}
                             onClick={() => {
                                 restartGame();
                                 setShowNewGameDialog(false);
                             }}
                         >
                             Restart
-                        </ButtonBase>
-                        <ButtonBase onClick={() => setShowNewGameDialog(false)}>Cancel</ButtonBase>
+                        </Button>
+                        <Button onClick={() => setShowNewGameDialog(false)}>Cancel</Button>
                     </DialogActions>
                 </Dialog>
             )}
@@ -299,16 +287,16 @@ export const App = () => {
                     <DialogTitle>You solved the puzzle</DialogTitle>
                     <DialogContent>Yay!</DialogContent>
                     <DialogActions>
-                        <ButtonBase
-                            className={"active"}
+                        <Button
+                            color={"primary"}
                             onClick={() => {
                                 restartGame();
                                 setShowWinDialog(false);
                             }}
                         >
                             New word
-                        </ButtonBase>
-                        <ButtonBase onClick={() => setShowWinDialog(false)}>Close</ButtonBase>
+                        </Button>
+                        <Button onClick={() => setShowWinDialog(false)}>Close</Button>
                     </DialogActions>
                 </Dialog>
             )}
@@ -325,16 +313,16 @@ export const App = () => {
                         </div>
                     </DialogContent>
                     <DialogActions>
-                        <ButtonBase
+                        <Button
                             onClick={() => {
                                 restartGame();
                                 setShowSettingsDialog(false);
                             }}
                         >
                             Restart game
-                        </ButtonBase>
+                        </Button>
 
-                        <ButtonBase onClick={() => setShowSettingsDialog(false)}>Close</ButtonBase>
+                        <Button onClick={() => setShowSettingsDialog(false)}>Close</Button>
                     </DialogActions>
                 </Dialog>
             )}

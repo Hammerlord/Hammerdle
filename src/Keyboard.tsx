@@ -1,6 +1,6 @@
-import { ButtonBase } from "@material-ui/core";
 import { Undo } from "@material-ui/icons";
 import { createUseStyles } from "react-jss";
+import Button from "./Button";
 import { DELETE, SUBMIT } from "./constants";
 
 const LAYOUT = [
@@ -110,19 +110,19 @@ const Keyboard = ({ onClickButton, currentWord = "", submissions = [], enableSub
             {LAYOUT.map((keys, i) => (
                 <div key={i} className={classes.row}>
                     {keys.map((key) => (
-                        <ButtonBase onClick={() => onClickButton(key)} className={getSelector(key)} key={key}>
+                        <Button onClick={() => onClickButton(key)} className={getSelector(key)} key={key}>
                             {key}
-                        </ButtonBase>
+                        </Button>
                     ))}
                 </div>
             ))}
             <div className={classes.controlBar}>
-                <ButtonBase onClick={() => onClickButton(SUBMIT)} className={"submit"} disabled={!enableSubmit}>
+                <Button onClick={() => onClickButton(SUBMIT)} className={"submit"} disabled={!enableSubmit}>
                     Submit
-                </ButtonBase>
-                <ButtonBase onClick={() => onClickButton(DELETE)} className={"delete"}>
+                </Button>
+                <Button onClick={() => onClickButton(DELETE)} className={"delete"}>
                     <Undo />
-                </ButtonBase>
+                </Button>
             </div>
         </div>
     );
