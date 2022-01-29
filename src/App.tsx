@@ -1,7 +1,7 @@
 import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
-import { DELETE, SUBMIT } from "./constants";
+import { DEFAULT_SETTINGS, DELETE, SUBMIT } from "./constants";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
 import dictionaryWords from "../resources/5letterwords.json";
@@ -9,8 +9,8 @@ import mapleStoryLib from "../resources/words.json";
 import commonWords from "../resources/commonwords.json";
 import { Settings } from "@material-ui/icons";
 import Button from "./Button";
-import { getHints } from "./utils";
-import SettingsDialog from "./SettingsDialog";
+import { getHints, loadSettings, saveSettings } from "./utils";
+import SettingsDialog, { GameSettings } from "./SettingsDialog";
 
 const useStyles = createUseStyles({
     app: {
@@ -81,10 +81,7 @@ export const App = () => {
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-    const [settings, setSettings] = useState({
-        isMapleStoryDictionEnabled: true,
-        isHardMode: false,
-    });
+    const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
     const { isHardMode, isMapleStoryDictionEnabled } = settings;
     const [gameEnded, setGameEnded] = useState(false);
@@ -224,6 +221,16 @@ export const App = () => {
         restartGame();
     }, [settings]);
 
+    useEffect(() => {
+        setSettings(loadSettings());
+    }, []);
+
+    const onApplySettings = (settings: GameSettings) => {
+        setSettings(settings);
+        setShowSettingsDialog(false);
+        saveSettings(settings);
+    };
+
     const getCommonDiction = (): object => {
         return mapleStoryLib.words
             .concat(commonWords.words)
@@ -337,14 +344,7 @@ export const App = () => {
                 </Dialog>
             )}
             {showSettingsDialog && (
-                <SettingsDialog
-                    settings={settings}
-                    onApplySettings={(settings) => {
-                        setSettings(settings);
-                        setShowSettingsDialog(false);
-                    }}
-                    onClose={() => setShowSettingsDialog(false)}
-                />
+                <SettingsDialog settings={settings} onApplySettings={onApplySettings} onClose={() => setShowSettingsDialog(false)} />
             )}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}

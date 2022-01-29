@@ -1,3 +1,6 @@
+import { GameSettings } from "./SettingsDialog";
+import { DEFAULT_SETTINGS, SETTINGS } from "./constants";
+
 export const getHints = ({ submissions, correctAnswer }) => {
     const successes = {}; // {[index: string]: letter}
     const mustUse = {}; // Count map
@@ -32,5 +35,18 @@ export const getHints = ({ submissions, correctAnswer }) => {
     return {
         successes: Object.keys(successes).map((index) => Number(index)),
         mustUse,
+    };
+};
+
+export const saveSettings = (settings: GameSettings) => {
+    window.localStorage.setItem(SETTINGS, JSON.stringify(settings));
+};
+
+export const loadSettings = (): GameSettings => {
+    const settingsStr = window.localStorage.getItem(SETTINGS);
+    const settings = JSON.parse(settingsStr) || {};
+    return {
+        ...DEFAULT_SETTINGS,
+        ...settings,
     };
 };
