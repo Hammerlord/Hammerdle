@@ -1,11 +1,13 @@
-import { ButtonBase, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
+import { ButtonBase, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
 import { DELETE, SUBMIT } from "./constants";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
 import dictionaryWords from "../resources/5letterwords.json";
-import availableWords from "../resources/words.json";
+import mapleStoryLib from "../resources/words.json";
+import commonWords from "../resources/commonwords.json";
+import { Settings } from "@material-ui/icons";
 
 const useStyles = createUseStyles({
     app: {
@@ -39,6 +41,10 @@ const useStyles = createUseStyles({
         margin: "0 2rem",
         maxWidth: "100vw",
     },
+    headerRight: {
+        display: "flex",
+        justifyContent: "space-between",
+    },
     gridContainer: {
         position: "absolute",
         left: "50%",
@@ -47,7 +53,7 @@ const useStyles = createUseStyles({
     keyboardContainer: {
         marginTop: "1.5rem",
     },
-    newWordContainer: {
+    toolContainer: {
         height: "5rem",
         display: "flex",
         flexDirection: "column",
@@ -60,6 +66,16 @@ const ROW_SIZE = 5;
 
 const STARTING_GRID = Array.from({ length: GUESSES }).map(() => Array.from({ length: ROW_SIZE }).map(() => null));
 
+const baseDictionary = dictionaryWords.words.reduce((acc, word) => {
+    acc[word] = true;
+    return acc;
+}, {});
+
+const mapleDictionary = mapleStoryLib.words.reduce((acc, word) => {
+    acc[word] = true;
+    return acc;
+}, {});
+
 export const getRandomItem = (array: any[]): any => {
     const index = Math.floor(Math.random() * array.length);
     return array[index];
@@ -69,18 +85,15 @@ export const App = () => {
     const classes = useStyles();
     const [rows, setRows] = useState(STARTING_GRID);
     const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
-    const [words] = useState(availableWords.words);
-    const [correctAnswer, setCorrectAnswer] = useState(getRandomItem(words));
-    const [dictionary, setDictionary] = useState(
-        availableWords.words.concat(dictionaryWords.words).reduce((acc, word) => {
-            acc[word] = true;
-            return acc;
-        }, {})
-    );
+    const [correctAnswer, setCorrectAnswer] = useState("");
+    const [dictionary, setDictionary] = useState(baseDictionary);
+
     const [notice, setNotice] = useState(null);
     const [gameEnded, setGameEnded] = useState(false);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
+    const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+    const [isMapleStoryDictionEnabled, setEnableMapleStoryDiction] = useState(false);
 
     const onSubmit = () => {
         if (gameEnded) {
@@ -185,20 +198,48 @@ export const App = () => {
         return () => window.removeEventListener("keydown", onKeyPress);
     }, [rows, rowIndexToSubmit, onSubmit, onKey, onDelete]);
 
-    const newWord = () => {
-        if (!gameEnded) {
-            setNotice(`The word was: ${correctAnswer.toUpperCase()}`);
+    useEffect(() => {
+        restartGame();
+    }, []);
+
+    const getCommonDiction = () => {
+        return mapleStoryLib.words
+            .concat(commonWords.words)
+            .filter((word) => baseDictionary[word])
+            .reduce((acc, word) => {
+                acc[word] = true;
+                return acc;
+            }, {});
+    };
+
+    const restartGame = () => {
+        let words;
+
+        if (!isMapleStoryDictionEnabled) {
+            words = getCommonDiction();
+            setDictionary(baseDictionary);
         } else {
-            setGameEnded(false);
+            words = mapleStoryLib.words;
+            setDictionary({ ...baseDictionary, ...mapleDictionary });
         }
+
+        setGameEnded(false);
         setRows(STARTING_GRID);
         setCorrectAnswer(getRandomItem(words));
         setRowIndexToSubmit(0);
     };
 
+    const giveUp = () => {
+        if (!gameEnded) {
+            setNotice(`The word was: ${correctAnswer.toUpperCase()}`);
+        }
+
+        restartGame();
+    };
+
     const onClickNewWord = () => {
         if (gameEnded) {
-            newWord();
+            giveUp();
         } else {
             setShowNewGameDialog(true);
         }
@@ -209,10 +250,17 @@ export const App = () => {
             <div className={classes.gridContainer}>
                 <div className={classes.header}>
                     <h1>Hammerdle</h1>
-                    <div className={classes.newWordContainer}>
-                        <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
-                            New word
-                        </ButtonBase>
+                    <div className={classes.headerRight}>
+                        <div className={classes.toolContainer}>
+                            <ButtonBase className={gameEnded ? "active" : undefined} onClick={onClickNewWord}>
+                                New word
+                            </ButtonBase>
+                        </div>
+                        <div className={classes.toolContainer}>
+                            <ButtonBase onClick={() => setShowSettingsDialog(!showSettingsDialog)}>
+                                <Settings />
+                            </ButtonBase>
+                        </div>
                     </div>
                 </div>
                 {rows.map((row: string[], i) => (
@@ -236,7 +284,7 @@ export const App = () => {
                         <ButtonBase
                             className={"active"}
                             onClick={() => {
-                                newWord();
+                                restartGame();
                                 setShowNewGameDialog(false);
                             }}
                         >
@@ -254,13 +302,39 @@ export const App = () => {
                         <ButtonBase
                             className={"active"}
                             onClick={() => {
-                                newWord();
+                                restartGame();
                                 setShowWinDialog(false);
                             }}
                         >
                             New word
                         </ButtonBase>
                         <ButtonBase onClick={() => setShowWinDialog(false)}>Close</ButtonBase>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {showSettingsDialog && (
+                <Dialog open={true} onClose={() => setShowSettingsDialog(false)} disablePortal={true}>
+                    <DialogTitle>Settings</DialogTitle>
+                    <DialogContent>
+                        <div>
+                            <Checkbox
+                                onClick={() => setEnableMapleStoryDiction(!isMapleStoryDictionEnabled)}
+                                checked={isMapleStoryDictionEnabled}
+                            />
+                            Enable MapleStory diction
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <ButtonBase
+                            onClick={() => {
+                                restartGame();
+                                setShowSettingsDialog(false);
+                            }}
+                        >
+                            Restart game
+                        </ButtonBase>
+
+                        <ButtonBase onClick={() => setShowSettingsDialog(false)}>Close</ButtonBase>
                     </DialogActions>
                 </Dialog>
             )}
