@@ -10,6 +10,7 @@ import commonWords from "../resources/commonwords.json";
 import { Settings } from "@material-ui/icons";
 import Button from "./Button";
 import { getHints } from "./utils";
+import SettingsDialog from "./SettingsDialog";
 
 const useStyles = createUseStyles({
     app: {
@@ -80,8 +81,12 @@ export const App = () => {
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-    const [isMapleStoryDictionEnabled, setEnableMapleStoryDiction] = useState(false);
-    const [isHardMode, setIsHardMode] = useState(false);
+    const [settings, setSettings] = useState({
+        isMapleStoryDictionEnabled: false,
+        isHardMode: false,
+    });
+
+    const { isHardMode, isMapleStoryDictionEnabled } = settings;
     const [gameEnded, setGameEnded] = useState(false);
 
     const getInvalidAnswerError = (): string | undefined => {
@@ -217,7 +222,7 @@ export const App = () => {
 
     useEffect(() => {
         restartGame();
-    }, []);
+    }, [settings]);
 
     const getCommonDiction = (): object => {
         return mapleStoryLib.words
@@ -330,38 +335,14 @@ export const App = () => {
                 </Dialog>
             )}
             {showSettingsDialog && (
-                <Dialog open={true} onClose={() => setShowSettingsDialog(false)} disablePortal={true}>
-                    <DialogTitle>Settings</DialogTitle>
-                    <DialogContent>
-                        <div>
-                            <label>
-                                <Checkbox
-                                    onClick={() => setEnableMapleStoryDiction(!isMapleStoryDictionEnabled)}
-                                    checked={isMapleStoryDictionEnabled}
-                                />
-                                Enable MapleStory diction
-                            </label>
-                        </div>
-                        <div>
-                            <label>
-                                <Checkbox onClick={() => setIsHardMode(!isHardMode)} checked={isHardMode} />
-                                Enable hard mode
-                            </label>
-                        </div>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            onClick={() => {
-                                restartGame();
-                                setShowSettingsDialog(false);
-                            }}
-                        >
-                            Restart game
-                        </Button>
-
-                        <Button onClick={() => setShowSettingsDialog(false)}>Close</Button>
-                    </DialogActions>
-                </Dialog>
+                <SettingsDialog
+                    settings={settings}
+                    onApplySettings={(settings) => {
+                        setSettings(settings);
+                        setShowSettingsDialog(false);
+                    }}
+                    onClose={() => setShowSettingsDialog(false)}
+                />
             )}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
