@@ -72,50 +72,52 @@ export const getRandomItem = (array: any[]): any => {
 export const App = () => {
     const classes = useStyles();
     const [rows, setRows] = useState(STARTING_GRID);
-    const [rowIndexToSubmit, setRowIndexToSubmit] = useState(0);
+    const [numGuesses, setNumGuesses] = useState(0);
     const [correctAnswer, setCorrectAnswer] = useState("");
     const [dictionary, setDictionary] = useState(baseDictionary);
 
     const [notice, setNotice] = useState(null);
-    const [gameEnded, setGameEnded] = useState(false);
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
     const [isMapleStoryDictionEnabled, setEnableMapleStoryDiction] = useState(false);
+    const [gameEnded, setGameEnded] = useState(false);
 
     const onSubmit = () => {
         if (gameEnded) {
             return;
         }
 
-        const isIncompleteAnswer = rows[rowIndexToSubmit].some((answer) => !answer);
+        const isIncompleteAnswer = rows[numGuesses].some((answer) => !answer);
         if (isIncompleteAnswer) {
             return;
         }
 
-        const currentAnswer = rows[rowIndexToSubmit].join("");
+        const currentAnswer = rows[numGuesses].join("");
         if (!dictionary[currentAnswer]) {
             setNotice(`Word not found in the dictionary: ${currentAnswer?.toUpperCase()}`);
             return;
         }
 
-        const incremented = rowIndexToSubmit + 1;
-        if (incremented < GUESSES) {
-            setRowIndexToSubmit(incremented);
-        }
+        const incremented = numGuesses + 1;
+        setNumGuesses(incremented);
 
         if (currentAnswer === correctAnswer) {
-            setGameEnded(true);
             setShowWinDialog(true);
+            setGameEnded(true);
         } else if (incremented === GUESSES) {
             // Game over
-            setNotice(`Game ended! The correct answer was: ${correctAnswer.toUpperCase()}`);
+            setNotice(`Game ended! The correct answer was: ${correctAnswer?.toUpperCase()}`);
             setGameEnded(true);
         }
     };
 
     const onDelete = () => {
-        const row = rows[rowIndexToSubmit];
+        if (gameEnded) {
+            return;
+        }
+
+        const row = rows[numGuesses];
 
         let index = row.length - 1;
         for (let i = index; i >= 0; --i) {
@@ -126,8 +128,8 @@ export const App = () => {
 
         if (index >= 0) {
             const newRows = [...rows];
-            newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
-            newRows[rowIndexToSubmit][index] = null;
+            newRows[numGuesses] = [...newRows[numGuesses]];
+            newRows[numGuesses][index] = null;
             setRows(newRows);
             return;
         }
@@ -148,7 +150,7 @@ export const App = () => {
             return;
         }
 
-        const row = rows[rowIndexToSubmit];
+        const row = rows[numGuesses];
 
         const index = row.findIndex((answer) => {
             return !answer;
@@ -157,8 +159,8 @@ export const App = () => {
 
         if (isValidEntry) {
             const newRows = [...rows];
-            newRows[rowIndexToSubmit] = [...newRows[rowIndexToSubmit]];
-            newRows[rowIndexToSubmit][index] = key.toLowerCase();
+            newRows[numGuesses] = [...newRows[numGuesses]];
+            newRows[numGuesses][index] = key.toLowerCase();
             setRows(newRows);
         }
     };
@@ -184,13 +186,13 @@ export const App = () => {
         window.addEventListener("keydown", onKeyPress);
 
         return () => window.removeEventListener("keydown", onKeyPress);
-    }, [rows, rowIndexToSubmit, onSubmit, onKey, onDelete]);
+    }, [rows, numGuesses, onSubmit, onKey, onDelete]);
 
     useEffect(() => {
         restartGame();
     }, []);
 
-    const getCommonDiction = () => {
+    const getCommonDiction = (): object => {
         return mapleStoryLib.words
             .concat(commonWords.words)
             .filter((word) => baseDictionary[word])
@@ -201,7 +203,7 @@ export const App = () => {
     };
 
     const restartGame = () => {
-        let words;
+        let words: object;
 
         if (!isMapleStoryDictionEnabled) {
             words = getCommonDiction();
@@ -211,10 +213,10 @@ export const App = () => {
             setDictionary({ ...baseDictionary, ...mapleDictionary });
         }
 
-        setGameEnded(false);
         setRows(STARTING_GRID);
-        setCorrectAnswer(getRandomItem(words));
-        setRowIndexToSubmit(0);
+        setCorrectAnswer(getRandomItem(Object.keys(words)));
+        setNumGuesses(0);
+        setGameEnded(false);
     };
 
     const giveUp = () => {
@@ -252,14 +254,14 @@ export const App = () => {
                     </div>
                 </div>
                 {rows.map((row: string[], i) => (
-                    <Row currentWord={correctAnswer} row={row} isRowSubmitted={gameEnded || i < rowIndexToSubmit} key={i} />
+                    <Row currentWord={correctAnswer} row={row} isRowSubmitted={gameEnded || i < numGuesses} key={i} />
                 ))}
 
                 <div className={classes.keyboardContainer}>
                     <Keyboard
                         onClickButton={onKey}
-                        submissions={gameEnded ? rows : rows.slice(0, rowIndexToSubmit)}
-                        enableSubmit={!gameEnded && rows[rowIndexToSubmit].every((answer) => answer)}
+                        submissions={gameEnded ? rows : rows.slice(0, numGuesses)}
+                        enableSubmit={!gameEnded && rows[numGuesses] && rows[numGuesses].every((answer) => answer)}
                         currentWord={correctAnswer}
                     />
                 </div>
