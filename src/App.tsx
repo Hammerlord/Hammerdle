@@ -99,15 +99,15 @@ export const App = () => {
             return;
         }
 
-        if (currentAnswer === correctAnswer) {
-            setGameEnded(true);
-            setShowWinDialog(true);
-        }
-
         const incremented = rowIndexToSubmit + 1;
         if (incremented < GUESSES) {
             setRowIndexToSubmit(incremented);
-        } else {
+        }
+
+        if (currentAnswer === correctAnswer) {
+            setGameEnded(true);
+            setShowWinDialog(true);
+        } else if (incremented === GUESSES) {
             // Game over
             setNotice(`Game ended! The correct answer was: ${correctAnswer.toUpperCase()}`);
             setGameEnded(true);
