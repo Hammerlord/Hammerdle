@@ -38,6 +38,7 @@ const useStyles = createUseStyles({
 
 const Statistics = () => {
     const { winStreak, scores, totalGames, longestStreak } = loadStatistics() as StatisticsT;
+    const losses = totalGames - Object.values(scores).reduce((a, c) => a + c, 0);
 
     const classes = useStyles();
     const getProgressVal = (times: number): number => {
@@ -49,9 +50,11 @@ const Statistics = () => {
         return Math.max(min, Math.min(max, times + min));
     };
 
-    const getColor = (value) => {
-        value = Number(value);
-        const additionVal = (value - 1) * 12;
+    const getColor = (attempts?: string) => {
+        if (!attempts) {
+            return "grey";
+        }
+        const additionVal = (Number(attempts) - 1) * 12;
         return `rgb(${90 + additionVal}, ${104 + additionVal}, ${206 + additionVal})`;
     };
 
@@ -68,10 +71,18 @@ const Statistics = () => {
                         <div
                             className={classes.progressBarContainer}
                             style={{ width: `${getProgressVal(times)}%`, backgroundColor: getColor(attempts) }}
-                        ></div>{" "}
+                        />{" "}
                         {times}
                     </div>
                 ))}
+                <div className={classes.progress}>
+                    <div className={classes.attempts}>x</div>
+                    <div
+                        className={classes.progressBarContainer}
+                        style={{ width: `${getProgressVal(losses)}%`, backgroundColor: getColor() }}
+                    />{" "}
+                    {losses}
+                </div>
             </div>
         </div>
     );
