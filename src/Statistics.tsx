@@ -50,9 +50,9 @@ const Statistics = () => {
         return Math.max(min, Math.min(max, times + min));
     };
 
-    const getColor = (attempts?: string) => {
+    const getColor = (attempts?: string): string => {
         if (!attempts) {
-            return "grey";
+            return "#ababab";
         }
         const additionVal = (Number(attempts) - 1) * 12;
         return `rgb(${90 + additionVal}, ${104 + additionVal}, ${206 + additionVal})`;
