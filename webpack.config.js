@@ -14,7 +14,7 @@ module.exports = {
             },
             { test: /\.(js)$/, use: 'babel-loader' },
             {
-                test: /\.(jpe?g|png|gif)$/i,
+                test: /\.(jpe?g|png|gif|svg)$/i,
                 loader: 'file-loader',
                 options: {
                     name: '[path][name].[ext]'
