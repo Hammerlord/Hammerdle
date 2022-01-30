@@ -39,6 +39,15 @@ const useStyles = createUseStyles({
         "& p": {
             marginTop: 0,
         },
+        "& hr": {
+            borderTop: "none",
+            borderLeft: "none",
+            borderRight: "none",
+            borderColor: "#cccccc",
+        },
+        "& .MuiDialog-paper": {
+            margin: "16px",
+        },
     },
     header: {
         display: "flex",
@@ -355,7 +364,7 @@ export const App = () => {
             {showNewGameDialog && (
                 <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
                     <DialogTitle>Reset game</DialogTitle>
-                    <DialogContent>There is a game in progress. Restart with a new word?</DialogContent>
+                    <DialogContent>There is a game in progress. Forfeit and restart with a new word?</DialogContent>
                     <DialogActions>
                         <Button
                             color={"primary"}
@@ -415,15 +424,21 @@ export const App = () => {
                 <Dialog open={true} onClose={() => setShowHelpDialog(false)} disablePortal={true}>
                     <DialogTitle>How to play</DialogTitle>
                     <DialogContent>
-                        <p>Guess the 5-letter word in {GUESSES} tries!</p>
+                        <p>Guess the word in {GUESSES} tries!</p>
+                        <p>Each guess must be a valid 5-letter word. Press "SUBMIT" to enter a guess.</p>
+                        <p>On submission, tiles will change colours to show how close the guess was to the word.</p>
+                        <hr />
                         <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"lolly"} />
                         <br />
-                        <p>A yellow hint means that hidden word contains this letter, but not in the same place.</p>
+                        <p>"L" is in the word, but not in the right place.</p>
+                        <hr />
                         <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"ropes"} />
                         <br />
-
-                        <p>A green hint means that hidden word has this letter in the same place.</p>
-                        <p>Grey hints show letters that aren't in the word at all.</p>
+                        <p>"S" is in the right place.</p>
+                        <hr />
+                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"oozey"} />
+                        <br />
+                        <p>Letters with grey backgrounds aren't in the word at all.</p>
                         <hr />
                         <p>If you don't want to guess strange words like "ilbis", please turn off "MapleStory diction" in the settings.</p>
                     </DialogContent>
