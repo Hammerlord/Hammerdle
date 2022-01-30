@@ -1,17 +1,18 @@
-import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from "@material-ui/core";
+import { BarChart, Help, Settings } from "@material-ui/icons";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
+import dictionaryWords from "../resources/5letterwords.json";
+import commonWords from "../resources/commonwords.json";
+import mapleStoryLib from "../resources/words.json";
+import Button from "./Button";
 import { DEFAULT_SETTINGS, DELETE, GUESSES, ROW_SIZE, SUBMIT } from "./constants";
+import HelpDialog from "./HelpDialog";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
-import dictionaryWords from "../resources/5letterwords.json";
-import mapleStoryLib from "../resources/words.json";
-import commonWords from "../resources/commonwords.json";
-import { BarChart, Help, Settings } from "@material-ui/icons";
-import Button from "./Button";
-import { clearStatistics, getHints, loadSettings, saveLoss, saveNewScore, saveSettings } from "./utils";
 import SettingsDialog, { GameSettings } from "./SettingsDialog";
 import Statistics from "./Statistics";
+import { clearStatistics, getHints, loadSettings, saveLoss, saveNewScore, saveSettings } from "./utils";
 
 const useStyles = createUseStyles({
     "@media (max-width: 1024px)": {
@@ -420,33 +421,7 @@ export const App = () => {
                     </DialogActions>
                 </Dialog>
             )}
-            {showHelpDialog && (
-                <Dialog open={true} onClose={() => setShowHelpDialog(false)} disablePortal={true}>
-                    <DialogTitle>How to play</DialogTitle>
-                    <DialogContent>
-                        <p>Guess the word in {GUESSES} tries!</p>
-                        <p>Each guess must be a valid 5-letter word. Press "SUBMIT" to enter a guess.</p>
-                        <p>On submission, tiles will change colours to show how close the guess was to the word.</p>
-                        <hr />
-                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"lolly"} />
-                        <br />
-                        <p>"L" is in the word, but not in the right place.</p>
-                        <hr />
-                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"ropes"} />
-                        <br />
-                        <p>"S" is in the right place.</p>
-                        <hr />
-                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"oozey"} />
-                        <br />
-                        <p>Letters with grey backgrounds aren't in the word at all.</p>
-                        <hr />
-                        <p>If you don't want to guess strange words like "ilbis", please turn off "MapleStory diction" in the settings.</p>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setShowHelpDialog(false)}>Close</Button>
-                    </DialogActions>
-                </Dialog>
-            )}
+            {showHelpDialog && <HelpDialog open={true} onClose={() => setShowHelpDialog(false)} disablePortal={true} />}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
                 autoHideDuration={5000}
