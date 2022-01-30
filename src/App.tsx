@@ -73,9 +73,6 @@ const useStyles = createUseStyles({
         fontSize: "1rem !important",
         whiteSpace: "nowrap",
     },
-    statisticsDialogContent: {
-        minWidth: "200px",
-    },
     winAttempts: {
         marginBottom: "0.5rem",
     },
@@ -397,13 +394,11 @@ export const App = () => {
                 <Dialog open={true} onClose={() => setShowStatisticsDialog(false)} disablePortal={true}>
                     <DialogTitle>Statistics</DialogTitle>
                     <DialogContent>
-                        <div className={classes.statisticsDialogContent}>
-                            <p>
-                                Hard mode: {isHardMode ? "ON" : "OFF"} <br />
-                                MapleStory diction: {isMapleStoryDictionEnabled ? "ON" : "OFF"}
-                            </p>
-                            <Statistics />
-                        </div>
+                        <p>
+                            Hard mode: {isHardMode ? "ON" : "OFF"} <br />
+                            MapleStory diction: {isMapleStoryDictionEnabled ? "ON" : "OFF"}
+                        </p>
+                        <Statistics />
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setShowStatisticsDialog(false)}>Close</Button>

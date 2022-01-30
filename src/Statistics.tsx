@@ -1,10 +1,11 @@
-import { colors, LinearProgress } from "@material-ui/core";
-import classNames from "classnames";
 import { createUseStyles } from "react-jss";
 import { StatisticsT } from "./constants";
 import { loadStatistics } from "./utils";
 
 const useStyles = createUseStyles({
+    root: {
+        width: "250px",
+    },
     progress: {
         display: "flex",
         width: "100%",
@@ -40,7 +41,7 @@ const Statistics = () => {
 
     const classes = useStyles();
     const getProgressVal = (times: number): number => {
-        const min = 3;
+        const min = 1;
         if (totalGames === 0) {
             return min;
         }
@@ -50,12 +51,12 @@ const Statistics = () => {
 
     const getColor = (value) => {
         value = Number(value);
-        const additionVal = (value - 1) * 10;
+        const additionVal = (value - 1) * 12;
         return `rgb(${90 + additionVal}, ${104 + additionVal}, ${206 + additionVal})`;
     };
 
     return (
-        <div>
+        <div className={classes.root}>
             <div>Games played: {totalGames}</div>
             <div>Win streak: {winStreak}</div>
             <div className={classes.scoreboard}>
