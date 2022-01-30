@@ -1002,7 +1002,6 @@ ramen
 bluff
 range
 loyal
-kepts
 slimy
 steal
 fairs
