@@ -13,6 +13,11 @@ import { getHints, loadSettings, saveSettings } from "./utils";
 import SettingsDialog, { GameSettings } from "./SettingsDialog";
 
 const useStyles = createUseStyles({
+    "@media (max-width: 1024px)": {
+        h1: {
+            fontSize: "1.5rem",
+        },
+    },
     app: {
         fontFamily: "Barlow, Arial",
         userSelect: "none",
@@ -24,12 +29,18 @@ const useStyles = createUseStyles({
             cursor: "pointer",
             letterSpacing: "0.05rem",
         },
+        "& h1": {
+            margin: "0",
+            "@media (max-width: 800px)": {
+                fontSize: "1.5rem",
+            },
+        },
     },
     header: {
         display: "flex",
         justifyContent: "space-between",
-        margin: "0 2rem",
-        maxWidth: "100vw",
+        marginLeft: "1rem",
+        maxWidth: "100%",
     },
     headerRight: {
         display: "flex",
@@ -39,15 +50,24 @@ const useStyles = createUseStyles({
         position: "absolute",
         left: "50%",
         transform: "translateX(-50%)",
+        maxWidth: "100%",
     },
     keyboardContainer: {
-        marginTop: "1.5rem",
+        marginTop: "1rem",
+        "@media (max-width: 800px)": {
+            marginTop: "0.5rem",
+        },
     },
     toolContainer: {
         height: "5rem",
+        maxHeight: "7vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+    },
+    newWordButton: {
+        fontSize: "1rem !important",
+        whiteSpace: "nowrap",
     },
 });
 
@@ -278,10 +298,12 @@ export const App = () => {
         <div className={classes.app}>
             <div className={classes.gridContainer}>
                 <div className={classes.header}>
-                    <h1>Hammerdle</h1>
+                    <div className={classes.toolContainer}>
+                        <h1>Hammerdle</h1>
+                    </div>
                     <div className={classes.headerRight}>
                         <div className={classes.toolContainer}>
-                            <Button color={gameEnded ? "primary" : undefined} onClick={onClickNewWord}>
+                            <Button color={gameEnded ? "primary" : undefined} className={classes.newWordButton} onClick={onClickNewWord}>
                                 New word
                             </Button>
                         </div>

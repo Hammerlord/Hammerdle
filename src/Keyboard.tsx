@@ -17,6 +17,7 @@ const useKeyboardStyles = createUseStyles({
             width: "2.75rem",
             maxWidth: "9vw",
             padding: "unset",
+            maxHeight: "8vh",
             "&.not-included": {
                 backgroundColor: "#777777",
                 color: "white",
@@ -42,7 +43,8 @@ const useKeyboardStyles = createUseStyles({
                 },
             },
             "&.delete": {
-                width: "unset",
+                width: "5rem",
+                maxWidth: "unset",
                 padding: "0 1rem",
             },
         },
@@ -54,6 +56,9 @@ const useKeyboardStyles = createUseStyles({
     },
     controlBar: {
         marginTop: "1rem",
+        "@media (max-width: 800px)": {
+            marginTop: "0.5rem",
+        },
     },
 });
 

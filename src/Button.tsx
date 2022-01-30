@@ -26,14 +26,10 @@ const Button = ({ color = "secondary", children, className = "", ...other }) => 
     const classes = useStyles();
     return (
         <ButtonBase
-            className={classNames(
-                classes.root,
-                {
-                    primary: color === "primary",
-                    secondary: color === "secondary",
-                },
-                className
-            )}
+            className={classNames(classes.root, className, {
+                primary: color === "primary",
+                secondary: color === "secondary",
+            })}
             {...other}
         >
             {children}
