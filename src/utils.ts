@@ -1,5 +1,5 @@
+import { DEFAULT_SETTINGS, DEFAULT_STATISTICS, SETTINGS, StatisticsT } from "./constants";
 import { GameSettings } from "./SettingsDialog";
-import { DEFAULT_SETTINGS, SETTINGS } from "./constants";
 
 export const getHints = ({ submissions, correctAnswer }) => {
     const successes = {}; // {[index: string]: letter}
@@ -49,4 +49,43 @@ export const loadSettings = (): GameSettings => {
         ...DEFAULT_SETTINGS,
         ...settings,
     };
+};
+
+export const saveNewScore = (score: number) => {
+    const { totalGames, scores, winStreak } = loadStatistics();
+    console.log("saving score", score);
+    saveStatistics({
+        totalGames: totalGames + 1,
+        scores: {
+            ...scores,
+            [score]: scores[score] + 1,
+        },
+        winStreak: winStreak + 1,
+    });
+};
+
+export const saveLoss = () => {
+    const { totalGames, scores } = loadStatistics();
+    saveStatistics({
+        totalGames: totalGames + 1,
+        scores,
+        winStreak: 0,
+    });
+};
+
+export const saveStatistics = (statistics: StatisticsT) => {
+    Object.entries(statistics).forEach(([key, val]) => {
+        window.localStorage.setItem(key, JSON.stringify(val));
+    });
+};
+
+export const clearStatistics = () => {
+    saveStatistics(DEFAULT_STATISTICS);
+};
+
+export const loadStatistics = (): StatisticsT => {
+    return Object.keys(DEFAULT_STATISTICS).reduce((acc, key) => {
+        acc[key] = JSON.parse(window.localStorage.getItem(key)) || DEFAULT_STATISTICS[key];
+        return acc;
+    }, {}) as StatisticsT;
 };

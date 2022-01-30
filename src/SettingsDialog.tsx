@@ -40,7 +40,7 @@ const SettingsDialog = ({ settings, onApplySettings, onClose }) => {
                         Enable hard mode
                     </label>
                 </div>
-                <p>*Applying changes will restart the game.</p>
+                <p>*Applying changes will clear your stats and restart the game.</p>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => onApplySettings(workingSettings)} color={settings !== workingSettings ? "primary" : undefined}>

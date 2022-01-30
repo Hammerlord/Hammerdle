@@ -1,16 +1,17 @@
 import { Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Typography } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { createUseStyles } from "react-jss";
-import { DEFAULT_SETTINGS, DELETE, SUBMIT } from "./constants";
+import { DEFAULT_SETTINGS, DELETE, GUESSES, ROW_SIZE, SUBMIT } from "./constants";
 import Keyboard from "./Keyboard";
 import Row from "./Row";
 import dictionaryWords from "../resources/5letterwords.json";
 import mapleStoryLib from "../resources/words.json";
 import commonWords from "../resources/commonwords.json";
-import { Settings } from "@material-ui/icons";
+import { BarChart, Settings } from "@material-ui/icons";
 import Button from "./Button";
-import { getHints, loadSettings, saveSettings } from "./utils";
+import { clearStatistics, getHints, loadSettings, saveLoss, saveNewScore, saveSettings } from "./utils";
 import SettingsDialog, { GameSettings } from "./SettingsDialog";
+import Statistics from "./Statistics";
 
 const useStyles = createUseStyles({
     "@media (max-width: 1024px)": {
@@ -34,6 +35,9 @@ const useStyles = createUseStyles({
             "@media (max-width: 800px)": {
                 fontSize: "1.5rem",
             },
+        },
+        "& p": {
+            marginTop: 0,
         },
     },
     header: {
@@ -69,10 +73,18 @@ const useStyles = createUseStyles({
         fontSize: "1rem !important",
         whiteSpace: "nowrap",
     },
+    statisticsDialogContent: {
+        minWidth: "200px",
+    },
+    winAttempts: {
+        marginBottom: "0.5rem",
+    },
+    iconButton: {
+        "&.MuiButtonBase-root": {
+            padding: "0.5rem",
+        },
+    },
 });
-
-const GUESSES = 6;
-const ROW_SIZE = 5;
 
 const STARTING_GRID = Array.from({ length: GUESSES }).map(() => Array.from({ length: ROW_SIZE }).map(() => null));
 
@@ -101,6 +113,7 @@ export const App = () => {
     const [showNewGameDialog, setShowNewGameDialog] = useState(false);
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+    const [showStatisticsDialog, setShowStatisticsDialog] = useState(false);
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
     const { isHardMode, isMapleStoryDictionEnabled } = settings;
@@ -152,10 +165,12 @@ export const App = () => {
 
         const currentAnswer = rows[numGuesses].join("");
         if (currentAnswer === correctAnswer) {
+            saveNewScore(incremented);
             setShowWinDialog(true);
             setGameEnded(true);
         } else if (incremented === GUESSES) {
             // Game over
+            saveLoss();
             setNotice(`Game ended! The correct answer was: ${correctAnswer?.toUpperCase()}`);
             setGameEnded(true);
         }
@@ -249,6 +264,7 @@ export const App = () => {
         setSettings(settings);
         setShowSettingsDialog(false);
         saveSettings(settings);
+        clearStatistics();
     };
 
     const getCommonDiction = (): object => {
@@ -281,6 +297,7 @@ export const App = () => {
     const giveUp = () => {
         if (!gameEnded) {
             setNotice(`The word was: ${correctAnswer.toUpperCase()}`);
+            saveLoss();
         }
 
         restartGame();
@@ -308,8 +325,13 @@ export const App = () => {
                             </Button>
                         </div>
                         <div className={classes.toolContainer}>
-                            <Button color={null} onClick={() => setShowSettingsDialog(!showSettingsDialog)}>
+                            <Button className={classes.iconButton} color={null} onClick={() => setShowSettingsDialog((prev) => !prev)}>
                                 <Settings />
+                            </Button>
+                        </div>
+                        <div className={classes.toolContainer}>
+                            <Button className={classes.iconButton} color={null} onClick={() => setShowStatisticsDialog((prev) => !prev)}>
+                                <BarChart />
                             </Button>
                         </div>
                     </div>
@@ -349,7 +371,10 @@ export const App = () => {
                 <Dialog open={true} onClose={() => setShowNewGameDialog(false)} disablePortal={true}>
                     <DialogTitle>You solved the puzzle</DialogTitle>
                     <DialogContent>
-                        Yay! Your stats: {numGuesses} / {GUESSES} attempts
+                        <div className={classes.winAttempts}>
+                            Yay! <br /> You took {numGuesses} / {GUESSES} guesses
+                        </div>
+                        <Statistics />
                     </DialogContent>
                     <DialogActions>
                         <Button
@@ -367,6 +392,23 @@ export const App = () => {
             )}
             {showSettingsDialog && (
                 <SettingsDialog settings={settings} onApplySettings={onApplySettings} onClose={() => setShowSettingsDialog(false)} />
+            )}
+            {showStatisticsDialog && (
+                <Dialog open={true} onClose={() => setShowStatisticsDialog(false)} disablePortal={true}>
+                    <DialogTitle>Statistics</DialogTitle>
+                    <DialogContent>
+                        <div className={classes.statisticsDialogContent}>
+                            <p>
+                                Hard mode: {isHardMode ? "ON" : "OFF"} <br />
+                                MapleStory diction: {isMapleStoryDictionEnabled ? "ON" : "OFF"}
+                            </p>
+                            <Statistics />
+                        </div>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowStatisticsDialog(false)}>Close</Button>
+                    </DialogActions>
+                </Dialog>
             )}
             <Snackbar
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
