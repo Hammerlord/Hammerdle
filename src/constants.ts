@@ -14,11 +14,13 @@ export interface StatisticsT {
     winStreak: number;
     scores: { [attempts: string]: number }; // Eg. { 1: 6 }
     totalGames: number;
+    longestStreak: number;
 }
 
 export const DEFAULT_STATISTICS: StatisticsT = {
     winStreak: 0,
     totalGames: 0,
+    longestStreak: 0,
     scores: Array.from({ length: GUESSES }).reduce((acc, _, i) => {
         acc[i + 1] = 0;
         return acc;

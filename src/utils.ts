@@ -52,8 +52,7 @@ export const loadSettings = (): GameSettings => {
 };
 
 export const saveNewScore = (score: number) => {
-    const { totalGames, scores, winStreak } = loadStatistics();
-    console.log("saving score", score);
+    const { totalGames, scores, winStreak, longestStreak } = loadStatistics();
     saveStatistics({
         totalGames: totalGames + 1,
         scores: {
@@ -61,15 +60,17 @@ export const saveNewScore = (score: number) => {
             [score]: scores[score] + 1,
         },
         winStreak: winStreak + 1,
+        longestStreak: Math.max(winStreak + 1, longestStreak),
     });
 };
 
 export const saveLoss = () => {
-    const { totalGames, scores } = loadStatistics();
+    const { totalGames, scores, longestStreak } = loadStatistics();
     saveStatistics({
         totalGames: totalGames + 1,
         scores,
         winStreak: 0,
+        longestStreak,
     });
 };
 

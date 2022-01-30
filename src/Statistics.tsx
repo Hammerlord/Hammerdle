@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
 });
 
 const Statistics = () => {
-    const { winStreak, scores, totalGames } = loadStatistics() as StatisticsT;
+    const { winStreak, scores, totalGames, longestStreak } = loadStatistics() as StatisticsT;
 
     const classes = useStyles();
     const getProgressVal = (times: number): number => {
@@ -59,6 +59,7 @@ const Statistics = () => {
         <div className={classes.root}>
             <div>Games played: {totalGames}</div>
             <div>Win streak: {winStreak}</div>
+            <div>Longest streak: {longestStreak} </div>
             <div className={classes.scoreboard}>
                 <div className={classes.scoreboardTitle}>Guesses Scoreboard</div>
                 {Object.entries(scores).map(([attempts, times]) => (
