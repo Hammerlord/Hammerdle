@@ -52,12 +52,12 @@ const useKeyboardStyles = createUseStyles({
     row: {
         display: "flex",
         justifyContent: "center",
-        margin: "0 1rem",
+        margin: "0 0.5rem",
     },
     controlBar: {
         marginTop: "1rem",
         "@media (max-width: 800px)": {
-            marginTop: "0.5rem",
+            marginTop: "0.25rem",
         },
     },
 });

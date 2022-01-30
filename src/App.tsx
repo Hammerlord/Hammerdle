@@ -7,7 +7,7 @@ import Row from "./Row";
 import dictionaryWords from "../resources/5letterwords.json";
 import mapleStoryLib from "../resources/words.json";
 import commonWords from "../resources/commonwords.json";
-import { BarChart, Settings } from "@material-ui/icons";
+import { BarChart, Help, Settings } from "@material-ui/icons";
 import Button from "./Button";
 import { clearStatistics, getHints, loadSettings, saveLoss, saveNewScore, saveSettings } from "./utils";
 import SettingsDialog, { GameSettings } from "./SettingsDialog";
@@ -24,11 +24,11 @@ const useStyles = createUseStyles({
         userSelect: "none",
         height: "100%",
         width: "100%",
-        letterSpacing: "0.05rem",
+        letterSpacing: "0.02rem",
         "& button": {
             fontFamily: "Barlow, Arial",
             cursor: "pointer",
-            letterSpacing: "0.05rem",
+            letterSpacing: "0.03rem",
         },
         "& h1": {
             margin: "0",
@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
     header: {
         display: "flex",
         justifyContent: "space-between",
-        marginLeft: "1rem",
+        marginLeft: "0.5rem",
         maxWidth: "100%",
     },
     headerRight: {
@@ -78,7 +78,7 @@ const useStyles = createUseStyles({
     },
     iconButton: {
         "&.MuiButtonBase-root": {
-            padding: "0.5rem",
+            padding: "0.25rem",
         },
     },
 });
@@ -111,6 +111,7 @@ export const App = () => {
     const [showWinDialog, setShowWinDialog] = useState(false);
     const [showSettingsDialog, setShowSettingsDialog] = useState(false);
     const [showStatisticsDialog, setShowStatisticsDialog] = useState(false);
+    const [showHelpDialog, setShowHelpDialog] = useState(false);
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
     const { isHardMode, isMapleStoryDictionEnabled } = settings;
@@ -331,6 +332,11 @@ export const App = () => {
                                 <BarChart />
                             </Button>
                         </div>
+                        <div className={classes.toolContainer}>
+                            <Button className={classes.iconButton} color={null} onClick={() => setShowHelpDialog((prev) => !prev)}>
+                                <Help />
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 {rows.map((row: string[], i) => (
@@ -369,7 +375,7 @@ export const App = () => {
                     <DialogTitle>You solved the puzzle</DialogTitle>
                     <DialogContent>
                         <div className={classes.winAttempts}>
-                            Yay! <br /> You took {numGuesses} / {GUESSES} guesses
+                            Yay! <br /> You took {numGuesses} / {GUESSES} guesses.
                         </div>
                         <Statistics />
                     </DialogContent>
@@ -402,6 +408,27 @@ export const App = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={() => setShowStatisticsDialog(false)}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+            {showHelpDialog && (
+                <Dialog open={true} onClose={() => setShowHelpDialog(false)} disablePortal={true}>
+                    <DialogTitle>How to play</DialogTitle>
+                    <DialogContent>
+                        <p>Guess the 5-letter word in {GUESSES} tries!</p>
+                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"lolly"} />
+                        <br />
+                        <p>A yellow hint means that hidden word contains this letter, but not in the same place.</p>
+                        <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"ropes"} />
+                        <br />
+
+                        <p>A green hint means that hidden word has this letter in the same place.</p>
+                        <p>Grey hints show letters that aren't in the word at all.</p>
+                        <hr />
+                        <p>If you don't want to guess strange words like "ilbis", please turn off "MapleStory diction" in the settings.</p>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowHelpDialog(false)}>Close</Button>
                     </DialogActions>
                 </Dialog>
             )}
