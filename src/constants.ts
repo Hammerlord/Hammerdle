@@ -6,7 +6,7 @@ export const GUESSES = 6;
 export const ROW_SIZE = 5;
 
 export const DEFAULT_SETTINGS = {
-    isMapleStoryDictionEnabled: true,
+    isMapleStoryDictionEnabled: false,
     isHardMode: false,
 };
 

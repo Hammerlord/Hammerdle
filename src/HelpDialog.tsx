@@ -41,10 +41,12 @@ const HelpDialog = ({ onClose, open, ...other }) => {
                     <div className={classes.example}>
                         <Row row={["i", "l", "b", "i", "s"]} isRowSubmitted={true} currentWord={"oozey"} />
                     </div>
-                    <p>Letters with grey backgrounds aren't in the word at all.</p>
+                    <p>Letters with a grey background aren't in the word at all.</p>
                 </div>
                 <hr />
-                <p>If you don't want to guess strange words like "ilbis", please turn off "MapleStory diction" in the settings.</p>
+                <p>
+                    If you don't want to guess strange words like "ilbis", please ensure "MapleStory diction" is turned off in the settings.
+                </p>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Close</Button>
